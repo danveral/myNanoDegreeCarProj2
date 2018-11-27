@@ -160,7 +160,7 @@ def fit_polynomial(warped, Minv):
     leftx, lefty, rightx, righty, out_img = find_lane_pixels(warped)
 
     # according to my measurement, not very accurate.
-    xm_per_pix = 3.7/600
+    xm_per_pix = 3.7/990
     ym_per_pix = 30./780
 
     left_fit = np.polyfit(lefty, leftx, 2)
@@ -208,11 +208,13 @@ def fit_polynomial(warped, Minv):
     pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
     pts = np.hstack((pts_left, pts_right))
 
+    offset = ((pts_right[:,719,0] + pts_left[:,719,0])/2 - 675) * xm_per_pix
+
     cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
     newwarp = cv2.warpPerspective(color_warp, Minv, (warped.shape[1], warped.shape[0])) 
 
     #vehicle's offset of the middle of the lane.
-    offset = (np.average(np.nonzero(newwarp[:,:,1]))-655) * xm_per_pix
+    #offset = (np.average(np.nonzero(newwarp[:,:,1]))-655) * xm_per_pix
 
     return newwarp,offset,real_left_curverad, real_right_curverad, gap, out_img
 
